@@ -10,9 +10,12 @@ The Python program itself can download the comic and then copy it to your deskto
 so that it is easy to find. This will free you from having to check the website
 yourself to see whether it has updated.
 
+For scheduling, use launchd in Mac OS:
+https://davidhamann.de/2018/03/13/setting-up-a-launchagent-macos-cron/
+
 Note:
-    This only downloads from http://www.lefthandedtoons.com/ and
-    http://buttersafe.com/ because all websites are different.
+    This only downloads from http://www.lefthandedtoons.com/
+    All websites are different, depending on HTML DOMs/tags and class names.
 
 """
 import datetime, shelve, re, bs4, requests, os
@@ -105,27 +108,6 @@ def main():
         match = re.search('\w+ \d+, \d{4}', title_text)
         if not check_key(comic_shelf, url) or compare_timestamps(match.group(), comic_shelf, url):
             save_comic(comic_url, comic_shelf, url)
-
-    """
-    # Download page
-    url = 'http://buttersafe.com'
-    soup = get_soup(url)
-
-    # Get comic URL in case it needs to be downloaded
-    div_elements = soup.find('div', attrs={'id':'comic'})
-    comic_url = div_elements.find('img')['src']
-
-    # Compare page's timestamp to shelve's
-    comic_header = soup.select('#headernav-date')
-    if not comic_header:
-        print('Can not find comic timestamp.')
-    else:
-        header_text = comic_header[0].getText()
-        match = re.search('(\w+), (\w+) (\d+).., (\d{40})', header_text)
-        comic_timestamp = f'{match.group(2)} {match.group(3)}, {match.group(4)}'
-        if not check_key(comic_shelf, url) or compare_timestamps(comic_timestamp, comic_shelf, url):
-            save_comic(comic_url, comic_shelf, url)
-    """
     comic_shelf.close()
 
 
